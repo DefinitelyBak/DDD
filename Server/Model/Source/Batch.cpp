@@ -3,12 +3,25 @@
 
 namespace Server::Model
 {
-
-    Batch::Batch(std::string ref, std::string sku, int qty, date::year_month_day data):
-        _ref(ref), _sku(sku), _availableQuantity(qty), _data(data), _allocateQuantity(0)
+    Batch::Batch():
+        _ref(""), _sku(""), _availableQuantity(0), _allocateQuantity(0), _data(date::year_month_day{})
     {};
 
-    void Batch::Allocate(OrderLine line)
+    Batch::Batch(std::string ref, std::string sku, int qty, date::year_month_day data, const std::vector<OrderLine>& orderLines):
+        _ref(ref), _sku(sku), _availableQuantity(qty), _data(data), _allocateQuantity(0)
+    {
+        for(const auto& line : orderLines)
+        {
+            _allocations.insert(line);
+            _allocateQuantity += line.GetQuantity();
+        }
+    };
+
+    Batch::Batch(std::string ref, std::string sku, int availableQuantity, int allocateQuantity, date::year_month_day data):
+        _ref(ref), _sku(sku), _availableQuantity(availableQuantity), _allocateQuantity(allocateQuantity), _data(data) 
+    {}
+
+    void Batch::Allocate(const OrderLine &line)
     {
         if(!CanAllocate(line))
             return;
@@ -59,6 +72,11 @@ namespace Server::Model
     {
         return _sku == line.GetSku() &&
                _availableQuantity >= line.GetQuantity();
+    };
+
+    void Batch::SetOrders(const std::vector<OrderLine>& orderLines)
+    {
+        _allocations = SetOrderLines(orderLines.begin(), orderLines.end());
     };
 
     bool operator==(const Batch &lhs, const Batch &rhs)

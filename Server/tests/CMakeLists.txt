@@ -9,20 +9,24 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(
   Tests
-  ${CMAKE_CURRENT_SOURCE_DIR}/Model/Source/testBatches.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/Model/Source/Auxiliary.cpp
+  ## Model
+  ${CMAKE_CURRENT_SOURCE_DIR}/Source/Model/TestBatches.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/Source/Model/Auxiliary.cpp
+  ## Database
+  ${CMAKE_CURRENT_SOURCE_DIR}/Source/Database/TestORM.cpp
 )
 
 target_include_directories(
     Tests 
   PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/Model/Include
+    ${CMAKE_CURRENT_SOURCE_DIR}/Include
 )
 
 target_link_libraries(
     Tests
   PRIVATE
     Model
+    Database
     GTest::gtest_main
 )
 

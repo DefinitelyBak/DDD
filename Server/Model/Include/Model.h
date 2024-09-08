@@ -3,6 +3,7 @@
 #include "Decl.h"
 #include "Precompile.h"
 
+#include "Exception/OutOfStock.h"
 #include "Batch.h"
 
 
@@ -31,7 +32,7 @@ namespace Server::Model
                 return batch;
             }
 
-        return std::shared_ptr<Batch>();
+        throw OutOfStock("Артикула " + line.GetSku() + " нет в наличии");
     };
 
 }

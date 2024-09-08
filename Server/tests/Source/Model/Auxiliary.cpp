@@ -1,4 +1,4 @@
-#include "Auxiliary.h"
+#include "Model/Auxiliary.h"
 
 
 namespace Server::Tests
@@ -13,7 +13,7 @@ namespace Server::Tests
         std::string sku, int batchQty, int lineQty)
     {
         return std::pair<Model::Batch, Model::OrderLine>(
-            Model::Batch("Batch-001", sku, batchQty, date::year_month_day()),
+            Model::Batch("Batch-001", sku, batchQty),
             Model::OrderLine("order-123", sku, lineQty));
     }
 

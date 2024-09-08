@@ -2,7 +2,7 @@
 
 #include "Precompile.h"
 
-#include "Auxiliary.h"
+#include "Model/Auxiliary.h"
 #include "Model.h"
 
 
@@ -14,7 +14,7 @@ namespace Server::Tests
 
   TEST(Model, AllocatingToBatchReducesAvailableQuantity)
   {
-    Batch batch = Batch("batch-001", "SMALL-TABLE", 20, year_month_day{});
+    Batch batch = Batch("batch-001", "SMALL-TABLE", 20);
     OrderLine line = OrderLine("order-ref", "SMALL-TABLE", 2);
     batch.Allocate(line);
 
@@ -43,7 +43,7 @@ namespace Server::Tests
 
   TEST(Model, CannotAllocateIfSkusDoNotMatch)
   {
-    Batch batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100, year_month_day{});
+    Batch batch = Batch("batch-001", "UNCOMFORTABLE-CHAIR", 100);
     OrderLine line = OrderLine("order-123", "EXPENSIVE-TOASTER", 10);
     EXPECT_FALSE(batch.CanAllocate(line));
   };
@@ -59,12 +59,7 @@ namespace Server::Tests
   TEST(Model, PrefersCurrentStockBatchesToShipments)
   {
     const year_month_day ymd{std::chrono::floor<days>(std::chrono::system_clock::now())};
-    day tomorrowDay = ymd.day();
-    month tomorrowMonth = ymd.month();
-    year tomorrowYear = ymd.year();
-    tomorrowDay++;
-
-    const year_month_day tomorrow{tomorrowYear, tomorrowMonth, tomorrowDay};
+    const year_month_day tomorrow(year(ymd.year()), month(ymd.month()), ++day(ymd.day()));
 
     std::list<std::shared_ptr<Batch>> batches;
     batches.emplace_back(std::make_shared<Batch>("in-stock-batch", "RETRO-CLOCK", 100, ymd));
@@ -75,20 +70,13 @@ namespace Server::Tests
 
     EXPECT_EQ(batches.front()->GetAvailableQuantity(), 90);
     EXPECT_EQ(batches.back()->GetAvailableQuantity(), 100);
-
   };
 
   TEST(Model, PrefersEarlierBatches)
   {
     const year_month_day today{std::chrono::floor<days>(std::chrono::system_clock::now())};
-    day tomorrowDay = today.day();
-    month tomorrowMonth = today.month();
-    year tomorrowYear = today.year();
-    tomorrowDay++;
-
-    const year_month_day tomorrow{tomorrowYear, tomorrowMonth, tomorrowDay};
-    tomorrowDay++;
-    const year_month_day later{tomorrowYear, tomorrowMonth, tomorrowDay};
+    const year_month_day tomorrow(year(today.year()), month(today.month()), ++day(today.day()));
+    const year_month_day later(year(tomorrow.year()), month(tomorrow.month()), ++day(tomorrow.day()));
 
     std::vector<std::shared_ptr<Batch>> batches;
     batches.emplace_back(std::make_shared<Batch>("speedy-batch", "MINIMALIST-SPOON", 100, today));
@@ -111,12 +99,7 @@ namespace Server::Tests
    TEST(Model, ReturnsAllocatedBatchRef)
   {
     const year_month_day today{std::chrono::floor<days>(std::chrono::system_clock::now())};
-    day tomorrowDay = today.day();
-    month tomorrowMonth = today.month();
-    year tomorrowYear = today.year();
-    tomorrowDay++;
-
-    const year_month_day tomorrow{tomorrowYear, tomorrowMonth, tomorrowDay};
+    const year_month_day tomorrow(year(today.year()), month(today.month()), ++day(today.day()));
 
     std::deque<std::shared_ptr<Batch>> batches;
     std::shared_ptr<Batch> inStockBatch = std::make_shared<Batch>("in-stock-batch-ref", "HIGHBROW-POSTER", 100);
@@ -129,6 +112,25 @@ namespace Server::Tests
 
     auto allocation = Allocate(line, batches.begin(), batches.end());
     EXPECT_EQ(allocation->GetReference(), inStockBatch->GetReference());
-  }
+  };
+
+  TEST(Model, RaisesOutOfStockExceptionIfCannotAllocate)
+  {
+    std::vector<std::shared_ptr<Batch>> batches;
+    batches.emplace_back(std::make_shared<Batch>("batch1", "SMALL-FORK", 10));
+    Allocate(OrderLine("order1", "SMALL-FORK", 10), batches.begin(), batches.end());
+
+    EXPECT_THROW({
+        try
+        {
+            Allocate(OrderLine("order2", "SMALL-FORK", 1), batches.begin(), batches.end());
+        }
+        catch(const OutOfStock& e)
+        {
+            EXPECT_STREQ( "Артикула SMALL-FORK нет в наличии", e.what() );
+            throw;
+        }
+    }, OutOfStock );
+  };
 
 }

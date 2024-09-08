@@ -14,15 +14,26 @@ namespace Server::Model
     {
     public:
         /// @brief 
+        Batch();
+
+        /// @brief 
         /// @param ref 
         /// @param sku 
         /// @param qty 
         /// @param data 
-        Batch(std::string ref, std::string sku, int qty, date::year_month_day data = date::year_month_day());
+        Batch(std::string ref, std::string sku, int qty, date::year_month_day data = date::year_month_day(), const std::vector<OrderLine>& orderLines = std::vector<OrderLine>());
+
+        /// @brief 
+        /// @param ref 
+        /// @param sku 
+        /// @param availableQuantity 
+        /// @param allocateQuantity 
+        /// @param data 
+        Batch(std::string ref, std::string sku, int availableQuantity, int allocateQuantity, date::year_month_day data = date::year_month_day());
 
         /// @brief 
         /// @param Line 
-        void Allocate(OrderLine line);
+        void Allocate(const OrderLine& line);
 
         /// @brief 
         /// @param line 
@@ -53,16 +64,20 @@ namespace Server::Model
         /// @return 
         bool CanAllocate(OrderLine line) const;
 
+        /// @brief 
+        /// @param orderLines 
+        void SetOrders(const std::vector<OrderLine>& orderLines);
+
     private:
         /// @brief 
-        using SetOrderLine = std::unordered_set<OrderLine, OrderLineHash>;
+        using SetOrderLines = std::unordered_set<OrderLine, OrderLineHash>;
 
         std::string _ref;
         std::string _sku;
         int _availableQuantity;
         int _allocateQuantity;
         date::year_month_day _data;
-        SetOrderLine _allocations;
+        SetOrderLines _allocations;
     };
 
     /// @brief 

@@ -10,12 +10,15 @@ namespace Server::Model
     /// @brief 
     class DLL_EXPORT OrderLine
     {
-    public: 
+    public:
+        /// @brief 
+        OrderLine();
+
         /// @brief 
         /// @param orderid 
         /// @param sku 
         /// @param qty 
-        explicit OrderLine(std::string orderId, std::string sku, int qty);
+        explicit OrderLine(std::string orderId, std::string sku, int qty, int batchId = -1);
 
         /// @brief 
         /// @return 
@@ -29,10 +32,15 @@ namespace Server::Model
         /// @return 
         int GetQuantity() const;
 
+        /// @brief 
+        /// @return 
+        int GetParrentBatchId() const;
+
     private:
         std::string _orderid;
         std::string _sku;
         int _qty;
+        int _batchId;
     };
 
     /// @brief 

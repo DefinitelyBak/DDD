@@ -4,6 +4,7 @@ add_library(
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/Batch.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/OrderLine.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Source/OrderLineHash.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/Source/Exception/OutOfStock.cpp
 )
 
 target_include_directories(

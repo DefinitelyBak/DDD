@@ -4,8 +4,11 @@
 namespace Server::Model
 {
 
-    OrderLine::OrderLine(std::string orderId, std::string sku, int qty): 
-        _orderid(orderId), _sku(sku), _qty(qty)
+    OrderLine::OrderLine(): _orderid(""), _sku(""), _qty(0), _batchId(-1)  
+    {}
+
+    OrderLine::OrderLine(std::string orderId, std::string sku, int qty, int batchId): 
+        _orderid(orderId), _sku(sku), _qty(qty), _batchId(batchId)
     {};
 
     std::string OrderLine::GetOrderId() const
@@ -21,6 +24,11 @@ namespace Server::Model
     int OrderLine::GetQuantity() const
     {
         return _qty;
+    };
+
+    int OrderLine::GetParrentBatchId() const
+    {
+        return _batchId;
     };
 
     bool operator==(const OrderLine &lhs, const OrderLine &rhs)
