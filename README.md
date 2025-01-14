@@ -7,17 +7,20 @@
 Проект будет состоять из 2 частей - сервер и клиент.
 
 * Для тестирования сервера будем использовать GoogleTests
-* Для тестирования СУБД попробую использовать SQLLite (если получится)
+* Для тестирования СУБД попробую использовать SQLLite
+
+Начнём со структуры проекта Server:
+* Shell - инфраструктура проекта, реализация шины событий. Я хочу чтобы была сессия хоторая будет работать с событиями, что бы была система регистрации событий и система регистрации обработчиков.
 
 
-### Доп. материал
+### Доп. материал:
 
 - https://habr.com/ru/articles/324984/ -- работа с chrono, ссылка на библиотеку date
 - https://habr.com/ru/articles/509220/ -- хеш-таблицы
 - https://docs.pocoproject.org/current/00200-DataUserManual.html -- Документация о работе с СУБД в POCO
 - https://cadovvl.wordpress.com/2015/02/26/poco-http-server/ -- Статья по работе с Poco Application
 - https://habr.com/ru/articles/320810/ -- Ещё одна статья о SQLlite
-- https://gist.github.com/maestrow/594fd9aee859c809b043 -- Статья о паттерне репозитории
+- https://gist.github.com/maestrow/594fd9aee859c809b043 -- Статья о паттерне "репозитории"
 - https://cadovvl.wordpress.com/2015/02/26/poco-http-server/ -- Статья по работе с Poco Application
 
 
@@ -29,3 +32,11 @@
 - https://habr.com/ru/articles/809831/ - плохая статья, про DDD.
 - https://habr.com/ru/companies/otus/articles/713728/ -  про проетирование, про шаблоны (нормальная статья, не хватает UML диаграмм и примера кода на все рассматриваемые шаблоны).
 - https://habr.com/ru/companies/otus/articles/715702/ - продолжение прошлой статьи выше в контексте БД.
+
+По СУБД нашёл книгу:
+- "БАЗЫ ДАННЫХ ПРОЕКТИРОВАНИЕ, ПРОГРАММИРОВАНИЕ, УПРАВЛЕНИЕ И АДМИНИСТРИРОВАНИЕ" В. К. ВОЛК. СПБ издательство "Лань"
+- https://youtube.com/playlist?list=PLcsjsqLLSfNCWyzSIQewgbJKmeVV53VH6&si=HCQnef2Wp1mHhk0n
+
+
+/// C++
+- https://habr.com/ru/articles/424593/ - шина событий С++  (по идее потокобезопасно). - кстати очень прикольно
