@@ -3,52 +3,41 @@
 #include "Poco/Data/Session.h"
 
 #include "OrderLine.h"
+#include "Session.h"
 
 
-using namespace Poco::Data;
-using namespace Poco::Data::Keywords;
-
-class OrderLineQuery
+namespace Adapters::QueryObjects
 {
-public:
-	OrderLineQuery(Poco::Data::Session& session);
 
-	std::list<OrderLine> GetAll();
-
-	template<typename Iterator>
-	void Add(Iterator begin, Iterator end)
+	class OrderLineQuery
 	{
-		std::list<OrderLineSql> orderLinesSql;;
+	public:
+		OrderLineQuery(Adapters::Session& session);
 
-		for (; begin != end; ++begin)
-			orderLinesSql.emplace_back(begin->GetSku(), begin->GetQuantity(), begin->GetOrderId());
+		std::list<OrderLine> GetAll();
 
-		try
+		template<typename Iterator>
+		void Add(Iterator begin, Iterator end)
 		{
-			_session << "INSERT INTO order_lines (sku, qty, orderid) VALUES (?, ?, ?)", use(orderLinesSql), now;
+			std::list<OrderLineSql> orderLinesSql;;
+
+			for (; begin != end; ++begin)
+				orderLinesSql.emplace_back(begin->GetSku(), begin->GetQuantity(), begin->GetOrderId());
+
+			try
+			{
+				_session() << "INSERT INTO order_lines (sku, qty, orderid) VALUES (?, ?, ?)", Poco::Data::Keywords::use(orderLinesSql), Poco::Data::Keywords::now;
+			}
+			catch (const Poco::Exception& ex)
+			{
+				throw ex;
+			}
 		}
-		catch (const Poco::Exception& ex)
-		{
-			throw ex;
-		}
-	}
 
-	void Add(OrderLine line);
+		void Add(OrderLine line);
 
-	template<typename Iterator>
-	Statement AddLater(Iterator begin, Iterator end)
-	{
-		std::list<OrderLineSql> orderLinesSql;
-
-		for (; begin != end; ++begin)
-			orderLinesSql.emplace_back(begin->GetSku(), begin->GetQuantity(), begin->GetOrderId());
-
-		return (_session << "INSERT INTO order_lines (sku, qty, orderid) VALUES (?, ?, ?)", bind(orderLinesSql));
-	}
-
-	Statement AddLater(OrderLine line);
-
-private:
-	using OrderLineSql = Poco::Tuple<std::string, int, std::string>;
-	Poco::Data::Session& _session;
-};
+	private:
+		using OrderLineSql = Poco::Tuple<std::string, int, std::string>;
+		Adapters::Session& _session;
+	};
+}

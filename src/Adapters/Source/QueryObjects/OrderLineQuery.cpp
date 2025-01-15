@@ -1,63 +1,53 @@
 #include "QueryObjects/OrderLineQuery.h"
 
-#include "Poco/Data/RecordSet.h"
-#include <Poco/Data/Statement.h>
 #include <Poco/Data/RecordSet.h>
+#include <Poco/Data/Statement.h>
 #include <Poco/Exception.h>
 
-OrderLineQuery::OrderLineQuery(Poco::Data::Session& session) : _session(session) {}
 
-std::list<OrderLine> OrderLineQuery::GetAll()
+namespace Adapters::QueryObjects
 {
-    std::list<OrderLine> result;
+    using namespace ::Poco::Data;
+    using namespace ::Poco::Data::Keywords;
 
-    try
+    OrderLineQuery::OrderLineQuery(Adapters::Session& session) : _session(session) {}
+
+    std::list<OrderLine> OrderLineQuery::GetAll()
     {
-        Statement select = (_session << "SELECT sku, qty, orderid FROM order_lines", now);
-        RecordSet rs(select);
+        std::list<OrderLine> result;
 
-        for(auto iter = rs.begin(); iter != rs.end(); ++iter)
+        try
         {
-            result.emplace_back((*iter)["orderid"].toString(),
-                                (*iter)["sku"].toString(),
-                                (*iter)["qty"].convert<int>());
+            Statement select = (_session() << "SELECT sku, qty, orderid FROM order_lines", now);
+            RecordSet rs(select);
+
+            for (auto iter = rs.begin(); iter != rs.end(); ++iter)
+            {
+                result.emplace_back((*iter)["orderid"].toString(),
+                    (*iter)["sku"].toString(),
+                    (*iter)["qty"].convert<int>());
+            }
+
+            return result;
+        }
+        catch (const Poco::Exception& ex)
+        {
+            throw ex;
         }
 
         return result;
     }
-    catch (const Poco::Exception& ex)
-    {
-        throw ex;
-    }
 
-    return result;
-}
-
-void OrderLineQuery::Add(OrderLine line)
-{
-    OrderLineSql sqlLine(line.GetSku(), line.GetQuantity(), line.GetOrderId());
-    try
+    void OrderLineQuery::Add(OrderLine line)
     {
-        _session << "INSERT INTO order_lines(sku, qty, orderid) VALUES(? , ? , ? )",
-            use(sqlLine), now;
-    }
-    catch (const Poco::Exception& ex)
-    {
-        throw ex;
+        OrderLineSql sqlLine(line.GetSku(), line.GetQuantity(), line.GetOrderId());
+        try
+        {
+            _session() << "INSERT INTO order_lines(sku, qty, orderid) VALUES(? , ? , ? )", use(sqlLine), now;
+        }
+        catch (const Poco::Exception& ex)
+        {
+            throw ex;
+        }
     }
 }
-
-Poco::Data::Statement OrderLineQuery::AddLater(OrderLine line)
-{
-    OrderLineSql sqlLine(line.GetSku(), line.GetQuantity(), line.GetOrderId());
-    try
-    { 
-        return _session << "INSERT INTO order_lines (sku, qty, orderid) VALUES (?, ?, ?)", bind(sqlLine);
-    }
-    catch (const Poco::Exception& ex)
-    {
-        throw ex;
-    }
-}
-
-

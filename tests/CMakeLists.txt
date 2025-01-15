@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(googletest)
 set(sources
     Unit/TestAllocate.cpp
     Unit/TestBatches.cpp
-    Integration/TestOrm.cpp
+    Integration/TestQueryObjects.cpp
     Integration/TestRepository.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})

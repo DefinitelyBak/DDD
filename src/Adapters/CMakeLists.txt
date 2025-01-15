@@ -1,8 +1,13 @@
 set(sources
-	Include/ORM.h
+	Include/Session.h
+    Include/SessionPool.h
+    Include/IRepository.h
+    Include/SQLiteRepository.h
     Include/QueryObjects/OrderLineQuery.h
-	Source/ORM.cpp
+	Source/Session.cpp
+    Source/SessionPool.cpp
     Source/QueryObjects/OrderLineQuery.cpp
+    Source/SQLiteRepository.cpp
 )
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${sources})
 
